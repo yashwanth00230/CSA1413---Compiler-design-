@@ -1,0 +1,26 @@
+#include <stdio.h>
+int main() {
+    char ch;
+    int spaces = 0, newlines = 0;
+    printf("Enter text (end input with #):\n");
+    while ((ch = getchar()) != '#') {   
+        if (ch == ' ')
+            spaces++;
+        else if (ch == '\n')
+            newlines++;
+    }
+    printf("\n--- Result ---\n");
+    printf("Number of spaces   : %d\n", spaces);
+    printf("Number of newlines : %d\n", newlines);
+    return 0;
+}
+
+
+
+OUTPUT:-
+Hello World
+This is a test#
+
+
+Number of spaces   : 3
+Number of newlines : 1
