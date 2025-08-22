@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX_PRODS  20
+#define MAX_LEN    512
+void remove_spaces(char *s) {
+    char *d = s;
+    for (; *s; s++) {
+        if (!isspace((unsigned char)*s)) *d++ = *s;
+    }
+    *d = '\0';
+}
+int begins_with_nonterm(const char *tok, char nonterm) {
+    return tok[0] == nonterm;
+}
+int is_epsilon(const char *tok) {
+    return (strcmp(tok, "ε") == 0 || strcmp(tok, "e") == 0 || strcmp(tok, "E") == 0);
+}
+int main(void) {
+    int n;
+    char line[MAX_LEN];
+    printf("Enter number of productions: ");
+    if (scanf("%d", &n) != 1 || n <= 0 || n > MAX_PRODS) {
+        printf("Invalid number of productions.\n");
+        return 1;
+    }
+    getchar(); 
+    for (int p = 0; p < n; p++) {
+        printf("Enter production %d (e.g., A->Aa|b|c):\n", p + 1);
+        if (!fgets(line, sizeof(line), stdin)) {
+            printf("Input error.\n");
+            return 1;
+        }
+        line[strcspn(line, "\r\n")] = '\0';
+        remove_spaces(line);
+        char *arrow = strstr(line, "->");
+        if (!arrow || arrow == line) {
+            printf("Malformed production (missing '->'): %s\n", line);
+            continue;
+        }
+        char A = line[0];  
+        char rhs_buf[MAX_LEN];
+        strncpy(rhs_buf, arrow + 2, sizeof(rhs_buf) - 1);
+        rhs_buf[sizeof(rhs_buf) - 1] = '\0';
+        char *alpha[MAX_PRODS]; int ac = 0; 
+        char *beta[MAX_PRODS];  int bc = 0; 
+        char *tok = strtok(rhs_buf, "|");
+        while (tok) {
+            if (begins_with_nonterm(tok, A)) {
+                if (tok[1] == '\0') {
+                    alpha[ac++] = "";
+                } else {
+                    alpha[ac++] = tok + 1;
+                }
+            } else {
+                beta[bc++] = tok;
+            }
+            tok = strtok(NULL, "|");
+        }
+        if (bc == 0 && ac > 0) {
+            beta[bc++] = "ε";
+        }
+        if (ac == 0) {
+            printf("No left recursion in %c. Production unchanged:\n", A);
+            printf("%c -> ", A);
+            for (int i = 0; i < bc; i++) {
+                printf("%s", beta[i]);
+                if (i != bc - 1) printf(" | ");
+            }
+            printf("\n");
+        } else {
+            printf("After eliminating left recursion for %c:\n", A);
+            printf("%c -> ", A);
+            for (int i = 0; i < bc; i++) {
+                if (is_epsilon(beta[i])) {
+                    printf("%c'", A);
+                } else {
+                    printf("%s %c'", beta[i], A);
+                }
+                if (i != bc - 1) printf(" | ");
+            }
+            printf("\n");
+            printf("%c' -> ", A);
+            for (int i = 0; i < ac; i++) {
+                if (alpha[i][0] == '\0' || is_epsilon(alpha[i])) {
+                    printf("%c'", A);
+                } else {
+                    printf("%s %c'", alpha[i], A);
+                }
+                if (i != ac - 1) printf(" | ");
+            }
+            if (ac > 0) printf(" | ");
+            printf("ε\n");
+        }
+        printf("\n");
+    }
+    return 0;
+}
+
+
+
+OUTPUT:-
+
+Enter number of productions: 3
+Enter production 1 (e.g., A->Aa|b|c):
+A -> A a | b | c
+After eliminating left recursion for A:
+A -> b A' | c A'
+A' -> a A' | ε
+
+Enter production 2 (e.g., A->Aa|b|c):
+S->Sx|y|z
+After eliminating left recursion for S:
+S -> y S' | z S'
+S' -> x S' | ε
+
+Enter production 3 (e.g., A->Aa|b|c):
+E->T|E+T|E-T
+After eliminating left recursion for E:
+E -> T E'
+E' -> +T E' | -T E' | ε
