@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 10
+#define SIZE 100
+void leftFactoring(char nonTerminal, char prods[MAX][SIZE], int n) {
+    int i, j, k, index = 0;
+    char prefix[SIZE], newProds[MAX][SIZE], remProds[MAX][SIZE];
+    int newCount = 0, remCount = 0;
+    strcpy(prefix, prods[0]);
+    for (i = 1; i < n; i++) {
+        j = 0;
+        while (prefix[j] && prods[i][j] && prefix[j] == prods[i][j])
+            j++;
+        prefix[j] = '\0';
+    }
+    if (strlen(prefix) == 0) {
+        printf("%c → ", nonTerminal);
+        for (i = 0; i < n; i++) {
+            printf("%s", prods[i]);
+            if (i != n - 1) printf(" | ");
+        }
+        printf("\n");
+        return;
+    }
+    for (i = 0; i < n; i++) {
+        if (strncmp(prods[i], prefix, strlen(prefix)) == 0) {
+            if (strlen(prods[i] + strlen(prefix)) == 0)
+                strcpy(newProds[newCount++], "ε");
+            else
+                strcpy(newProds[newCount++], prods[i] + strlen(prefix));
+        } else {
+            strcpy(remProds[remCount++], prods[i]);
+        }
+    }
+    char newNT = nonTerminal + 1;
+    printf("%c → %s%c'\n", nonTerminal, prefix, nonTerminal);
+    printf("%c' → ", nonTerminal);
+    for (i = 0; i < newCount; i++) {
+        printf("%s", newProds[i]);
+        if (i != newCount - 1) printf(" | ");
+    }
+    printf("\n");
+    if (remCount > 0) {
+        printf("%c → ", newNT);
+        for (i = 0; i < remCount; i++) {
+            printf("%s", remProds[i]);
+            if (i != remCount - 1) printf(" | ");
+        }
+        printf("\n");
+    }
+}
+int main() {
+    char nonTerminal;
+    int n, i;
+    char prods[MAX][SIZE];
+    printf("Enter the non-terminal: ");
+    scanf(" %c", &nonTerminal);
+    printf("Enter the number of productions: ");
+    scanf("%d", &n);
+    printf("Enter the productions (without spaces):\n");
+    for (i = 0; i < n; i++) {
+        scanf("%s", prods[i]);
+    }
+    printf("\nAfter Left Factoring:\n");
+    leftFactoring(nonTerminal, prods, n);
+    return 0;
+}
+
+
+
+OUTPUT :-
+Enter the non-terminal: A
+Enter the number of productions: 3
+Enter the productions (without spaces):
+ab
+ac
+d
+
+After Left Factoring:
+A → ab | ac | d
