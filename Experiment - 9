@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <string.h>
+char input[100];
+int pos = 0;
+int S() {
+    if (input[pos] == 'a') {
+        pos++;
+        if (S()) {
+            if (input[pos] == 'b') {
+                pos++;
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    return 1;
+}
+int main() {
+    printf("Grammar: S → aSb | ε\n");
+    printf("Enter a string: ");
+    scanf("%s", input);
+    if (S() && pos == strlen(input))
+        printf("String is VALID as per the grammar.\n");
+    else
+        printf("String is INVALID as per the grammar.\n");
+    return 0;
+}
+
+
+
+OUTPUT:-
+Grammar: S → aSb | ε
+Enter a string: aabb
+String is VALID as per the grammar.
