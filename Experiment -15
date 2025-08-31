@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <string.h>
+struct Instruction {
+    char result[10], op1[10], op2[10], operator[5];
+};
+int main() {
+    int n;
+    printf("Enter number of three-address code instructions: ");
+    scanf("%d", &n);
+    struct Instruction code[20];
+    printf("Enter the TAC instructions in the form: result operator op1 op2\n");
+    printf("Example: t1 = + a b   (means t1 = a + b)\n\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%s %s %s %s", code[i].result, code[i].operator, code[i].op1, code[i].op2);
+    }
+    printf("\n=== Optimized Assembly Code (Backend Output) ===\n");
+    for (int i = 0; i < n; i++) {
+        int eliminated = 0;
+        for (int j = 0; j < i; j++) {
+            if (strcmp(code[i].operator, code[j].operator) == 0 &&
+                strcmp(code[i].op1, code[j].op1) == 0 &&
+                strcmp(code[i].op2, code[j].op2) == 0) {
+                printf("MOV %s, %s   ; CSE applied\n", code[i].result, code[j].result);
+                eliminated = 1;
+                break;
+            }
+        }
+        if (!eliminated) {
+            if (strcmp(code[i].operator, "+") == 0)
+                printf("ADD %s, %s, %s\n", code[i].result, code[i].op1, code[i].op2);
+            else if (strcmp(code[i].operator, "-") == 0)
+                printf("SUB %s, %s, %s\n", code[i].result, code[i].op1, code[i].op2);
+            else if (strcmp(code[i].operator, "*") == 0)
+                printf("MUL %s, %s, %s\n", code[i].result, code[i].op1, code[i].op2);
+            else if (strcmp(code[i].operator, "/") == 0)
+                printf("DIV %s, %s, %s\n", code[i].result, code[i].op1, code[i].op2);
+        }
+    }
+    return 0;
+}
+
+
+
+OUTPUT:-
+Enter number of three-address code instructions: 4
+Enter the TAC instructions in the form: result operator op1 op2
+Example: t1 = + a b   (means t1 = a + b)
+
+t1 + a b
+t2 + a b
+t3 * t1 c
+d + t3 t2
+
+=== Optimized Assembly Code (Backend Output) ===
+ADD t1, a, b
+MOV t2, t1   ; CSE applied
+MUL t3, t1, c
+ADD d, t3, t2
