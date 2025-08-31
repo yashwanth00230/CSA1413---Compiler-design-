@@ -1,0 +1,28 @@
+#include <stdio.h>
+void beforeOptimization(int a, int b, int c, int d) {
+    int result;
+    result = (a * b) + (a * b) * c + (a * b) * d;
+    printf("Before Optimization: %d\n", result);
+}
+void afterOptimization(int a, int b, int c, int d) {
+    int result;
+    int temp;  
+    temp = a * b;
+    result = temp + temp * c + temp * d;
+    printf("After Optimization: %d\n", result);
+}
+int main() {
+    int a, b, c, d;
+    printf("Enter values for a, b, c, d: ");
+    scanf("%d %d %d %d", &a, &b, &c, &d);
+    beforeOptimization(a, b, c, d);
+    afterOptimization(a, b, c, d);
+    return 0;
+}
+
+
+
+OUTPUT :-
+Enter values for a, b, c, d: 1,2,3,4
+Before Optimization: 1710459600
+After Optimization: 1710459600
